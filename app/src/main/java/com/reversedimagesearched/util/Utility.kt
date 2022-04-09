@@ -56,12 +56,12 @@ class Utility {
         @RequiresApi(Build.VERSION_CODES.O)
         fun createFileForImage(context: Context): File? {
             val directoryToStore: File
-            directoryToStore = context.getExternalFilesDir("DukanSoftImages")!!
+            directoryToStore = context.getExternalFilesDir("ReversedImagesSearch")!!
             if (!directoryToStore.exists()) {
                 if (directoryToStore.mkdir());
             }
             var n = LocalDateTime.now()
-            val fname = "Image-$n.jpg"
+            val fname = "Image-$n.jpeg"
             val file = File(directoryToStore, fname)
             Log.i(LOG_TAG, "" + file)
             if (file.exists()) file.delete()
@@ -79,12 +79,12 @@ class Utility {
         @RequiresApi(Build.VERSION_CODES.O)
         fun createDirectoryAndSaveFile(context: Context, imageToSave: Bitmap): Uri? {
             val directoryToStore: File
-            directoryToStore = context.getExternalFilesDir("DukanSoftImages")!!
+            directoryToStore = context.getExternalFilesDir("ReversedImagesSearch")!!
             if (!directoryToStore.exists()) {
                 if (directoryToStore.mkdir());
             }
             var n = LocalDateTime.now()
-            val fname = "Image-$n.jpg"
+            val fname = "Image-$n.jpeg"
             val file = File(directoryToStore, fname)
             Log.i(LOG_TAG, "" + file)
             if (file.exists()) file.delete()

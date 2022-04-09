@@ -7,17 +7,17 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.reversedimagesearched.HomeFragment"
+        android:name="com.reversedimagesearched.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/reverseImageResultFragment"
-        android:name="com.reversedimagesearched.ReverseImageResultFragment"
+        android:name="com.reversedimagesearched.reverseimageresult.ReverseImageResultFragment"
         android:label="fragment_reverse_image_result"
         tools:layout="@layout/fragment_reverse_image_result" />
     <fragment
         android:id="@+id/allResultsFragment"
-        android:name="com.reversedimagesearched.util.AllResultsFragment"
+        android:name="com.reversedimagesearched.allsavedresults.AllResultsFragment"
         android:label="fragment_all_results"
         tools:layout="@layout/fragment_all_results" />
 </navigation>

@@ -146,7 +146,8 @@ dependencies {
 
     // Retrofit for networking
     implementation "com.squareup.retrofit2:retrofit:$version_retrofit"
-    implementation "com.squareup.retrofit2:converter-moshi:$version_retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$version_retrofit"
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.0.1'
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$version_retrofit_coroutines_adapter"
 
     // Moshi
@@ -164,5 +165,7 @@ dependencies {
 
     // Client for retrieving location
     implementation "com.google.android.gms:play-services-location:$version_play_services"
+
+    implementation 'org.jsoup:jsoup:1.10.2'
 
 }
