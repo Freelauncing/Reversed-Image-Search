@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:title="Home"
+        android:icon="@drawable/ic_home"
+        />
+
+    <item
+        android:id="@+id/reverseImageResultFragment"
+        android:title="Reverse Image Result"
+        android:icon="@drawable/ic_search"
+        />
+
+    <item
+        android:id="@+id/allResultsFragment"
+        android:title="All Saved Results"
+        android:icon="@drawable/ic_all_results"
+        />
+
+</menu>
