@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import com.reversedimagesearched.R
 import com.reversedimagesearched.databinding.FragmentHomeBinding
@@ -75,9 +76,11 @@ class HomeFragment : Fragment() {
         viewModel.openChoiceDialogue.observe(viewLifecycleOwner, EventObserver {
             showImageChoiceDialogue()
         })
-//        viewModel.clearImage.observe(viewLifecycleOwner,EventObserver{
-//            viewDataBinding.selectedImage.setImageResource(0)
-//        })
+        viewModel.productImageUri.observe(viewLifecycleOwner, Observer {
+            if(it!=null){
+                viewDataBinding.selectedImage.setImageURI(it)
+            }
+        })
     }
 
     private fun setupSnackbar() {
@@ -88,6 +91,7 @@ class HomeFragment : Fragment() {
         super.onResume()
         if(!viewModel.snackbarText.hasActiveObservers())
             setupSnackbar()
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
