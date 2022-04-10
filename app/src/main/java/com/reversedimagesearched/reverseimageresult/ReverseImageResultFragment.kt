@@ -50,31 +50,34 @@ class ReverseImageResultFragment : Fragment(), AdapterView.OnItemSelectedListene
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        reverseOnlineResourceList.add("None")
-        reverseOnlineResourceList.add("Google")
-        reverseOnlineResourceList.add("Bing")
-        reverseOnlineResourceList.add("Tineye")
+        try {
+            reverseOnlineResourceList.add("None")
+            reverseOnlineResourceList.add("Google")
+            reverseOnlineResourceList.add("Bing")
+            reverseOnlineResourceList.add("Tineye")
 
-               reverseImagesRecyclerViewAdapter = ReverseImagesRecyclerViewAdapter(ArrayList(),viewModel,requireContext())
-        viewDataBinding.productsList.layoutManager = GridLayoutManager(requireContext(),3)
-        viewDataBinding.productsList.adapter = reverseImagesRecyclerViewAdapter
-        (reverseImagesRecyclerViewAdapter as ReverseImagesRecyclerViewAdapter).notifyDataSetChanged()
+            reverseImagesRecyclerViewAdapter =
+                ReverseImagesRecyclerViewAdapter(ArrayList(), viewModel, requireContext())
+            viewDataBinding.productsList.layoutManager = GridLayoutManager(requireContext(), 3)
+            viewDataBinding.productsList.adapter = reverseImagesRecyclerViewAdapter
+            (reverseImagesRecyclerViewAdapter as ReverseImagesRecyclerViewAdapter).notifyDataSetChanged()
 
-        setUpObservers()
+            setUpObservers()
 
-        setupSnackbar()
+            setupSnackbar()
 
-        viewDataBinding.textView34.onItemSelectedListener = this
-// Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.server_array,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            viewDataBinding.textView34.adapter = adapter
+            viewDataBinding.textView34.onItemSelectedListener = this
+
+            ArrayAdapter.createFromResource(
+                requireContext(),
+                R.array.server_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                viewDataBinding.textView34.adapter = adapter
+            }
+        }catch (e:Exception){
+
         }
     }
 
@@ -82,7 +85,7 @@ class ReverseImageResultFragment : Fragment(), AdapterView.OnItemSelectedListene
         viewModel.updateList.observe(viewLifecycleOwner, Observer {
             if(viewModel.reverseImageLists.value!!.size>0){
                 Log.v("Hello","List")
-                viewDataBinding.progressBar?.visibility = View.GONE
+                viewDataBinding.progressBar.visibility = View.GONE
                 reverseImagesRecyclerViewAdapter!!.swapList(viewModel.reverseImageLists.value!!)
             }else{
                 reverseImagesRecyclerViewAdapter!!.swapList(ArrayList())
@@ -91,9 +94,9 @@ class ReverseImageResultFragment : Fragment(), AdapterView.OnItemSelectedListene
 
         viewModel.showLoading.observe(viewLifecycleOwner, Observer {
             if(it){
-                viewDataBinding.progressBar?.visibility = View.VISIBLE
+                viewDataBinding.progressBar.visibility = View.VISIBLE
             }else{
-                viewDataBinding.progressBar?.visibility = View.GONE
+                viewDataBinding.progressBar.visibility = View.GONE
             }
         })
     }
@@ -104,8 +107,6 @@ class ReverseImageResultFragment : Fragment(), AdapterView.OnItemSelectedListene
 
 
     override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-        // An item was selected. You can retrieve the selected item using
-        // parent.getItemAtPosition(pos)
         selectedResource = reverseOnlineResourceList[pos]
         if(selectedResource!="None"){
             viewModel.selectedMode.value = selectedResource
@@ -113,7 +114,6 @@ class ReverseImageResultFragment : Fragment(), AdapterView.OnItemSelectedListene
     }
 
     override fun onNothingSelected(parent: AdapterView<*>) {
-        // Another interface callback
     }
 
 }

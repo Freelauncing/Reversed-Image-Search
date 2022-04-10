@@ -71,15 +71,19 @@ class HomeFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        setupSnackbar()
-        setUpListeners()
+        try {
+            setupSnackbar()
+            setUpListeners()
 
-        MainActivity.mycallBack = object: MainActivity.callBackCropyImage {
-            override fun takeUri(muri: Uri) {
-                val uri = Utility.readUriImage(requireContext(),muri!!)
-                viewDataBinding.selectedImage.setImageURI(uri)
-                viewModel.setProductImageUri(uri!!)
+            MainActivity.mycallBack = object : MainActivity.callBackCropyImage {
+                override fun takeUri(muri: Uri) {
+                    val uri = Utility.readUriImage(requireContext(), muri!!)
+                    viewDataBinding.selectedImage.setImageURI(uri)
+                    viewModel.setProductImageUri(uri!!)
+                }
+
             }
+        }catch (e:Exception){
 
         }
     }
@@ -90,12 +94,17 @@ class HomeFragment : Fragment() {
             showImageChoiceDialogue()
         })
         viewDataBinding.floatingActionButton.setOnClickListener {
-
-            if(!viewModel.getProductImageUri().toString().isNullOrEmpty()){
-                val cropRequest = CropRequest.Auto(sourceUri = viewModel.getProductImageUri()!!, requestCode = 102)
-                Croppy.start(requireActivity(), cropRequest)
-            }else{
-                viewModel.showSnackbarMessage("Image Not Selected")
+            try {
+                if (!viewModel.getProductImageUri().toString().isNullOrEmpty()) {
+                    val cropRequest = CropRequest.Auto(
+                        sourceUri = viewModel.getProductImageUri()!!,
+                        requestCode = 102
+                    )
+                    Croppy.start(requireActivity(), cropRequest)
+                } else {
+                    viewModel.showSnackbarMessage("Image Not Selected")
+                }
+            }catch (e:Exception) {
             }
         }
         viewDataBinding.floatingActionButton2.setOnClickListener {
@@ -161,19 +170,27 @@ class HomeFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == pickImageFromGallery_Code) {
-            var imageUri: Uri? = data?.data
-            val uri = Utility.readUriImage(requireContext(),imageUri!!)
-            viewDataBinding.selectedImage.setImageURI(uri)
-            viewModel.setProductImageUri(uri!!)
-        }
-        if (requestCode === pickImageFromCamera_Code && resultCode === Activity.RESULT_OK) {
-            // by this point we have the camera photo on disk
-            val takenImage = BitmapFactory.decodeFile(photoFile!!.absolutePath)
-            viewModel.setProductImageUri(photoFile!!.toUri())
+        try {
+            if (resultCode == Activity.RESULT_OK && requestCode == pickImageFromGallery_Code) {
+                var imageUri: Uri? = data?.data
+                val uri = Utility.readUriImage(requireContext(), imageUri!!)
+                viewDataBinding.selectedImage.setImageURI(uri)
+                viewModel.setProductImageUri(uri!!)
+            }
+            if (requestCode === pickImageFromCamera_Code && resultCode === Activity.RESULT_OK) {
+                // by this point we have the camera photo on disk
+                val takenImage = BitmapFactory.decodeFile(photoFile!!.absolutePath)
+                viewModel.setProductImageUri(photoFile!!.toUri())
 
-            // viewDataBinding.selectedImage.setImageBitmap(takenImage)
-            viewDataBinding.selectedImage.setImageBitmap(Utility.rotateImageIfRequired(takenImage,photoFile!!.toUri()))
+                // viewDataBinding.selectedImage.setImageBitmap(takenImage)
+                viewDataBinding.selectedImage.setImageBitmap(
+                    Utility.rotateImageIfRequired(
+                        takenImage,
+                        photoFile!!.toUri()
+                    )
+                )
+            }
+        }catch (e:Exception) {
         }
     }
 

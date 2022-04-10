@@ -24,6 +24,7 @@ import com.reversedimagesearched.data.model.CommonResponse
 import com.reversedimagesearched.home.HomeFragment.Companion.Uploaded_Image_Url
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.lang.Exception
 import java.net.URL
 
 
@@ -60,30 +61,26 @@ class ReverseImagesRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        try {
+            val currentItem = reverImageList.get(position)
 
-        val currentItem = reverImageList.get(position)
-
-        holder.floatingActionButton.setOnClickListener {
-
-            (cxt as MainActivity).runOnUiThread(Runnable {
+            holder.floatingActionButton.setOnClickListener {
                 viewModel.takeUrl(currentItem = currentItem)
+            }
 
-            })
+            holder.image.setOnClickListener {
+                val imagePopup = ImagePopup(cxt)
+                imagePopup.initiatePopupWithGlide(currentItem.image_link) // Load Image from Drawable
+                imagePopup.viewPopup();
+            }
 
-
+            Glide.with(cxt)
+                .load(currentItem.image_link.toUri())
+                .centerCrop()
+                .into(holder.image)
+        }catch (e:Exception){
 
         }
-
-        holder.image.setOnClickListener {
-            val imagePopup = ImagePopup(cxt)
-            imagePopup.initiatePopupWithGlide(currentItem.image_link) // Load Image from Drawable
-            imagePopup.viewPopup();
-        }
-
-        Glide.with(cxt)
-            .load(currentItem.image_link.toUri())
-            .centerCrop()
-            .into(holder.image)
     }
 
 

@@ -18,6 +18,7 @@ import kotlinx.coroutines.*
 import okhttp3.Dispatcher
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.lang.Exception
 import java.net.URL
 
 class ReverseImageResultViewModel:ViewModel() {
@@ -51,57 +52,66 @@ class ReverseImageResultViewModel:ViewModel() {
         _updateList.value = Event("Update")
     }
     fun onclickSearch(){
-        if(!Uploaded_Image_Url.isNullOrEmpty()) {
-            viewModelScope.launch {
-                _reverseImageLists.value = ArrayList()
-                Log.v("HELLO", "Check")
-                _updateList.value = Event("Update")
-                _showLoading.value = true
-                if (selectedMode.value.toString().equals("Google")) {
-                    var res =
-                        reverseImageRetreiver.googleInverseImage(Uploaded_Image_Url)
-                    Log.v("HELLO", res.toString())
-                    _reverseImageLists.value!!.addAll(res)
-                } else if (selectedMode.value.toString().equals("Bing")) {
-                    var res =
-                        reverseImageRetreiver.bingInverseImage(Uploaded_Image_Url)
-                    Log.v("HELLO", res.toString())
-                    _reverseImageLists.value!!.addAll(res)
-                } else if (selectedMode.value.toString().equals("Tineye")) {
-                    var res =
-                        reverseImageRetreiver.tineyeInverseImage(Uploaded_Image_Url)
-                    Log.v("HELLO", res.toString())
-                    _reverseImageLists.value!!.addAll(res)
-                } else {
-                    showSnackbarMessage("No Server Selected")
+        try {
+            if (!Uploaded_Image_Url.isNullOrEmpty()) {
+                viewModelScope.launch {
+                    _reverseImageLists.value = ArrayList()
+                    Log.v("HELLO", "Check")
+                    _updateList.value = Event("Update")
+                    _showLoading.value = true
+                    if (selectedMode.value.toString().equals("Google")) {
+                        var res =
+                            reverseImageRetreiver.googleInverseImage(Uploaded_Image_Url)
+                        Log.v("HELLO", res.toString())
+                        _reverseImageLists.value!!.addAll(res)
+                    } else if (selectedMode.value.toString().equals("Bing")) {
+                        var res =
+                            reverseImageRetreiver.bingInverseImage(Uploaded_Image_Url)
+                        Log.v("HELLO", res.toString())
+                        _reverseImageLists.value!!.addAll(res)
+                    } else if (selectedMode.value.toString().equals("Tineye")) {
+                        var res =
+                            reverseImageRetreiver.tineyeInverseImage(Uploaded_Image_Url)
+                        Log.v("HELLO", res.toString())
+                        _reverseImageLists.value!!.addAll(res)
+                    } else {
+                        showSnackbarMessage("No Server Selected")
+                    }
+                    _updateList.value = Event("Update")
+                    _showLoading.value = false
+                    Log.v("HELLO", _reverseImageLists.value!!.size.toString())
                 }
-                _updateList.value = Event("Update")
-                _showLoading.value = false
-                Log.v("HELLO", _reverseImageLists.value!!.size.toString())
+            } else {
+                showSnackbarMessage("No Image Uploaded")
             }
-        }else{
-            showSnackbarMessage("No Image Uploaded")
+        }catch (e:Exception){
+
         }
     }
 
     fun takeUrl(currentItem:CommonResponse) {
-        _showLoading.value = true
-        GlobalScope.launch(Dispatchers.IO) {
-            val res = ReverseDbHelper.insertReverseImage(
-                DatabaseModel(
-                    0,
-                    convertToByteArray(Uploaded_Image_Url) ,// Uploaded_Image_Url
-                    Uploaded_Image_Url,//Uploaded_Image_Url,
-                    convertToByteArray(currentItem.image_link),
-                    currentItem.image_link,
-                    currentItem.name)
-            )
-            launch(Dispatchers.Main) {
-                showSnackbarMessage("Image Downloaded Successfully")
+        try {
+            _showLoading.value = true
+            GlobalScope.launch(Dispatchers.IO) {
+                val res = ReverseDbHelper.insertReverseImage(
+                    DatabaseModel(
+                        0,
+                        convertToByteArray(Uploaded_Image_Url),// Uploaded_Image_Url
+                        Uploaded_Image_Url,//Uploaded_Image_Url,
+                        convertToByteArray(currentItem.image_link),
+                        currentItem.image_link,
+                        currentItem.name
+                    )
+                )
+                launch(Dispatchers.Main) {
+                    showSnackbarMessage("Image Downloaded Successfully")
+                }
             }
-        }
 
-        _showLoading.value = false
+            _showLoading.value = false
+        }catch (e:Exception){
+
+        }
     }
 
     suspend fun convertToByteArray(url:String): ByteArray {

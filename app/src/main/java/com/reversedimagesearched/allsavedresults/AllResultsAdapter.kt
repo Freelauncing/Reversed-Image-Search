@@ -53,10 +53,7 @@ RecyclerView.Adapter<AllResultsAdapter.MyViewHolder>() {
         val currentItem = reverImageList.get(position)
 
         holder.floatingActionButton.setOnClickListener {
-
-            ReverseDbHelper.deleteReverseImageData(currentItem._id)
-
-            viewModel.getAllImagesListFromDb()
+            viewModel.deleteItem(currentItem._id)
         }
 
         holder.image.setOnClickListener {

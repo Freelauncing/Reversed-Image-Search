@@ -53,14 +53,18 @@ class AllResultsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        allResultsAdapter = AllResultsAdapter(ArrayList(),viewModel,requireContext())
-        viewDataBinding.recyclerView.layoutManager = GridLayoutManager(requireContext(),1)
-        viewDataBinding.recyclerView.adapter = allResultsAdapter
-        (allResultsAdapter as AllResultsAdapter).notifyDataSetChanged()
+        try {
+            allResultsAdapter = AllResultsAdapter(ArrayList(), viewModel, requireContext())
+            viewDataBinding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 1)
+            viewDataBinding.recyclerView.adapter = allResultsAdapter
+            (allResultsAdapter as AllResultsAdapter).notifyDataSetChanged()
 
-        setUpObservers()
+            setUpObservers()
 
-        setupSnackbar()
+            setupSnackbar()
+        }catch (e:Exception){
+
+        }
 
     }
 

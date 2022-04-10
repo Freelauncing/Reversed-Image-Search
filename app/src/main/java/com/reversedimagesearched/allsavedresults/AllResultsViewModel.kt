@@ -9,6 +9,10 @@ import com.reversedimagesearched.data.database.DatabaseModel
 import com.reversedimagesearched.data.database.ReverseDbHelper
 import com.reversedimagesearched.data.model.CommonResponse
 import com.reversedimagesearched.util.Event
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class AllResultsViewModel:ViewModel() {
 
@@ -31,10 +35,28 @@ class AllResultsViewModel:ViewModel() {
     }
 
     fun getAllImagesListFromDb(){
-        val list = ReverseDbHelper.getAllImages()
-        _reverseImageLists.value = ArrayList()
-        _reverseImageLists.value!!.addAll(list)
-        _updateList.value = Event("Update")
+        try {
+            val list = ReverseDbHelper.getAllImages()
+            _reverseImageLists.value = ArrayList()
+            _reverseImageLists.value!!.addAll(list)
+            _updateList.value = Event("Update")
+        }catch (e:Exception){
+
+        }
+    }
+
+    fun deleteItem(id:Int){
+        try {
+            GlobalScope.launch(Dispatchers.IO) {
+                ReverseDbHelper.deleteReverseImageData(id)
+
+                launch(Dispatchers.Main) {
+                    getAllImagesListFromDb()
+                }
+            }
+        }catch (e:Exception){
+
+        }
     }
 
 }

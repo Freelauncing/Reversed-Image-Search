@@ -72,31 +72,22 @@ class HomeViewModel:ViewModel() {
                 _showLoading.value  = true
                 val cp = productImageUri.value!!.path
                 val file = File(cp)
-                if(file.exists()) {
-                    Log.v("HELLO", file.toString())
-                }
+
                 val reqFile: RequestBody = RequestBody.create(MediaType.parse("image/jpeg"), file)
                 val body = MultipartBody.Part.createFormData("image", file.getName(), reqFile)
 
-                Log.v("HELLO",reqFile.contentType().toString())
-
                 val call: Call<ResponseBody> = reverseImageRetreiver.uploadInverseImage(body)
 
-                Log.v("HELLO",call.toString())
                 call.enqueue(object : Callback<ResponseBody?> {
                     override fun onResponse(
                         call: Call<ResponseBody?>,
                         response: Response<ResponseBody?>
                     ) {
                         _showLoading.value  = false
-                        Log.v("HELLO",response.toString())
                         if (response.isSuccessful()) {
 
                             val html = response.body()!!.string()
                             val document: Document = Jsoup.parse(html)
-                            Log.d("UploadImage", "Yeepee!!! = " + document.toString())
-                            Log.d("UploadImage", "Yeepee!!! = " + document.body().text())
-
                             Uploaded_Image_Url = document.body().text()
 
                             showSnackbarMessage("Image Uploaded Successfully !")
