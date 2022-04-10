@@ -6,26 +6,31 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.GsonBuilder
+import com.reversedimagesearched.data.remote.ReverseImageNetworkInterface
 import com.reversedimagesearched.data.remote.ReverseImageRetreiver
+import com.reversedimagesearched.home.HomeFragment.Companion.Uploaded_Image_Url
 import com.reversedimagesearched.util.Event
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import okhttp3.ResponseBody
+import okhttp3.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
 import java.io.IOException
 import java.net.SocketTimeoutException
+import java.util.concurrent.TimeUnit
 
 
 class HomeViewModel:ViewModel() {
 
-    val reverseImageRetreiver: ReverseImageRetreiver = ReverseImageRetreiver()
+    private val reverseImageRetreiver: ReverseImageRetreiver = ReverseImageRetreiver()
+
 
     // Two-way databinding, exposing MutableLiveData
     val productImageUri = MutableLiveData<Uri>()
@@ -35,9 +40,6 @@ class HomeViewModel:ViewModel() {
     private val _snackbarText = MutableLiveData<Event<String>>()
     val snackbarText: LiveData<Event<String>> = _snackbarText
 
-    init {
-
-    }
 
     fun onclickAddImage(){
         _openChoiceDialogue.value = Event(Unit)
@@ -58,8 +60,9 @@ class HomeViewModel:ViewModel() {
             viewModelScope.launch {
                 val cp = productImageUri.value!!.path
                 val file = File(cp)
-                Log.v("HELLO",file.toString())
-
+                if(file.exists()) {
+                    Log.v("HELLO", file.toString())
+                }
                 val reqFile: RequestBody = RequestBody.create(MediaType.parse("image/jpeg"), file)
                 val body = MultipartBody.Part.createFormData("image", file.getName(), reqFile)
 
@@ -79,10 +82,9 @@ class HomeViewModel:ViewModel() {
                             val html = response.body()!!.string()
                             val document: Document = Jsoup.parse(html)
                             Log.d("UploadImage", "Yeepee!!! = " + document.toString())
-                            Log.d("UploadImage", "Yeepee!!! = " + response.message())
-                            Log.d("UploadImage", "Yeepee!!! = " + response.body()?.contentLength())
-                            Log.d("UploadImage", "Yeepee!!! = " + response.body()?.contentType())
-                            Log.d("UploadImage", "Yeepee!!! = " + response.headers().byteCount())
+                            Log.d("UploadImage", "Yeepee!!! = " + document.body().text())
+
+                            Uploaded_Image_Url = document.body().text()
 
                         } else Log.d("UploadImage", "Response failure = " + response.message())
                     }

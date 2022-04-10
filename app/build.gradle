@@ -133,8 +133,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     // Retrofit with Moshi Converter (Object k liye) or Scalar Converter (String k liye)
-    implementation "com.squareup.retrofit2:converter-moshi:$version_retrofit"
-    //  implementation "com.squareup.retrofit2:converter-scalars:$version_retrofit"
+   // implementation "com.squareup.retrofit2:converter-moshi:$version_retrofit"
+    implementation "com.squareup.retrofit2:converter-scalars:$version_retrofit"
+    //implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
+
 
     // Navigation
     implementation "android.arch.navigation:navigation-fragment-ktx:1.0.0"

@@ -9,10 +9,9 @@ import retrofit2.http.*
 
 interface ReverseImageNetworkInterface {
 
-    @Headers("Content-Type: multipart/form-data")
-    @POST("upload")
     @Multipart
-     fun uploadImageToServer(
+    @POST("upload")
+    fun uploadImageToServer(
         @Part image : MultipartBody.Part
     ): Call<ResponseBody>
 

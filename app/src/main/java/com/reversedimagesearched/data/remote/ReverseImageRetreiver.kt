@@ -11,6 +11,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
+import retrofit2.http.Part
 import java.util.concurrent.TimeUnit
 
 
@@ -37,13 +39,14 @@ class ReverseImageRetreiver {
             .Builder()
             .baseUrl(BASE_URL)
             .client(client)
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
         reverseImageRetreiver = retrofit.create(ReverseImageNetworkInterface::class.java)
     }
 
-      fun uploadInverseImage(image: MultipartBody.Part): Call<ResponseBody> {
+    fun uploadInverseImage(@Part image: MultipartBody.Part): Call<ResponseBody> {
         return reverseImageRetreiver.uploadImageToServer(image)
     }
 

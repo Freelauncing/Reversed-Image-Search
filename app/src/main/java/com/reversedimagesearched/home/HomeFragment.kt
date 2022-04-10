@@ -38,6 +38,10 @@ class HomeFragment : Fragment() {
         AddProductViewModelFactory()
     }
 
+    companion object{
+        var Uploaded_Image_Url = ""
+    }
+
     var photoFile: File? = null
 
     private val pickImageFromGallery_Code = 100
