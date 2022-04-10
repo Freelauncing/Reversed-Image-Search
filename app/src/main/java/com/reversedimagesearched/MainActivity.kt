@@ -1,8 +1,11 @@
 package com.reversedimagesearched
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
@@ -25,6 +28,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
 
+    interface callBackCropyImage{
+        fun takeUri(uri: Uri)
+    }
+
+
     companion object {
         var permissionsList = listOf<String>(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -33,7 +41,11 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
         )
+        lateinit var mycallBack: callBackCropyImage
 
+        fun setListener(myBack: callBackCropyImage){
+            mycallBack = myBack
+        }
 
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +76,12 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        var imageUri: Uri? = data?.data
+        mycallBack.takeUri(imageUri!!)
     }
 
 }

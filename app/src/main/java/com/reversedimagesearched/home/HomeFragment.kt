@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,9 @@ import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
+import com.lyrebirdstudio.croppylib.Croppy
+import com.lyrebirdstudio.croppylib.main.CropRequest
+import com.reversedimagesearched.MainActivity
 import com.reversedimagesearched.R
 import com.reversedimagesearched.databinding.FragmentHomeBinding
 import com.reversedimagesearched.util.EventObserver
@@ -69,6 +73,15 @@ class HomeFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         setupSnackbar()
         setUpListeners()
+
+        MainActivity.mycallBack = object: MainActivity.callBackCropyImage {
+            override fun takeUri(muri: Uri) {
+                val uri = Utility.readUriImage(requireContext(),muri!!)
+                viewDataBinding.selectedImage.setImageURI(uri)
+                viewModel.setProductImageUri(uri!!)
+            }
+
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -76,9 +89,26 @@ class HomeFragment : Fragment() {
         viewModel.openChoiceDialogue.observe(viewLifecycleOwner, EventObserver {
             showImageChoiceDialogue()
         })
-        viewModel.productImageUri.observe(viewLifecycleOwner, Observer {
-            if(it!=null){
-                viewDataBinding.selectedImage.setImageURI(it)
+        viewDataBinding.floatingActionButton.setOnClickListener {
+
+            if(!viewModel.getProductImageUri().toString().isNullOrEmpty()){
+                val cropRequest = CropRequest.Auto(sourceUri = viewModel.getProductImageUri()!!, requestCode = 102)
+                Croppy.start(requireActivity(), cropRequest)
+            }else{
+                viewModel.showSnackbarMessage("Image Not Selected")
+            }
+        }
+        viewDataBinding.floatingActionButton2.setOnClickListener {
+            viewDataBinding.selectedImage.setImageResource(0)
+            viewModel.setProductImageUri("".toUri())
+            Uploaded_Image_Url=""
+            viewModel.showSnackbarMessage("Image Clear")
+        }
+        viewModel.showLoading.observe(viewLifecycleOwner, Observer {
+            if(it){
+                viewDataBinding.progressBar.visibility = View.VISIBLE
+            }else{
+                viewDataBinding.progressBar.visibility = View.GONE
             }
         })
     }
@@ -123,7 +153,6 @@ class HomeFragment : Fragment() {
         alertDialog.show()
     }
 
-    @SuppressLint("NewApi")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == pickImageFromGallery_Code) {
@@ -139,6 +168,16 @@ class HomeFragment : Fragment() {
 
             // viewDataBinding.selectedImage.setImageBitmap(takenImage)
             viewDataBinding.selectedImage.setImageBitmap(Utility.rotateImageIfRequired(takenImage,photoFile!!.toUri()))
+        }
+        Log.v("HELLO","CHECKO => "+data?.data.toString())
+        if (resultCode == Activity.RESULT_OK && requestCode == 102) {
+            Log.v("HELLO",data?.data.toString())
+            var imageUri: Uri? = data?.data
+            val uri = Utility.readUriImage(requireContext(),imageUri!!)
+            viewDataBinding.selectedImage.setImageURI(uri)
+            viewModel.setProductImageUri(uri!!)
+          //  viewDataBinding.selectedImage.setImageURI(data!!.data)
+
         }
     }
 

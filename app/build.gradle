@@ -170,4 +170,6 @@ dependencies {
 
     implementation 'org.jsoup:jsoup:1.10.2'
 
+    implementation 'com.github.lyrebirdstudio:Croppy:0.2'
+
 }

@@ -2,6 +2,7 @@ package com.reversedimagesearched.home
 
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -40,6 +41,12 @@ class HomeViewModel:ViewModel() {
     private val _snackbarText = MutableLiveData<Event<String>>()
     val snackbarText: LiveData<Event<String>> = _snackbarText
 
+    private val _showLoading = MutableLiveData<Boolean>()
+    val showLoading: LiveData<Boolean> = _showLoading
+
+    init {
+        productImageUri.value = "".toUri()
+    }
 
     fun onclickAddImage(){
         _openChoiceDialogue.value = Event(Unit)
@@ -49,7 +56,11 @@ class HomeViewModel:ViewModel() {
         productImageUri.value = uri
     }
 
-    private fun showSnackbarMessage(message: String) { //
+    fun getProductImageUri(): Uri? {
+        return productImageUri.value
+    }
+
+    fun showSnackbarMessage(message: String) { //
         _snackbarText.value = Event(message)
     }
 
@@ -58,6 +69,7 @@ class HomeViewModel:ViewModel() {
             showSnackbarMessage("Image Not Selected")
         }else{
             viewModelScope.launch {
+                _showLoading.value  = true
                 val cp = productImageUri.value!!.path
                 val file = File(cp)
                 if(file.exists()) {
@@ -76,6 +88,7 @@ class HomeViewModel:ViewModel() {
                         call: Call<ResponseBody?>,
                         response: Response<ResponseBody?>
                     ) {
+                        _showLoading.value  = false
                         Log.v("HELLO",response.toString())
                         if (response.isSuccessful()) {
 
@@ -85,11 +98,15 @@ class HomeViewModel:ViewModel() {
                             Log.d("UploadImage", "Yeepee!!! = " + document.body().text())
 
                             Uploaded_Image_Url = document.body().text()
+                            if(!Uploaded_Image_Url.isNullOrEmpty()){
+                                showSnackbarMessage("Image Uploaded Successfully !")
+                            }
 
                         } else Log.d("UploadImage", "Response failure = " + response.message())
                     }
 
                     override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
+                        _showLoading.value  = false
                         if (t is SocketTimeoutException) {
                             // "Connection Timeout";
                             Log.e("UploadImage", "Connection Timeout")
