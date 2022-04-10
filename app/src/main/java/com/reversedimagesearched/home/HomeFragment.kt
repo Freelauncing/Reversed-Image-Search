@@ -111,6 +111,12 @@ class HomeFragment : Fragment() {
                 viewDataBinding.progressBar.visibility = View.GONE
             }
         })
+
+        viewModel.productImageUri.observe(viewLifecycleOwner, Observer {
+            if(!it.toString().isNullOrEmpty()){
+                viewDataBinding.selectedImage.setImageURI(it)
+            }
+        })
     }
 
     private fun setupSnackbar() {
@@ -168,16 +174,6 @@ class HomeFragment : Fragment() {
 
             // viewDataBinding.selectedImage.setImageBitmap(takenImage)
             viewDataBinding.selectedImage.setImageBitmap(Utility.rotateImageIfRequired(takenImage,photoFile!!.toUri()))
-        }
-        Log.v("HELLO","CHECKO => "+data?.data.toString())
-        if (resultCode == Activity.RESULT_OK && requestCode == 102) {
-            Log.v("HELLO",data?.data.toString())
-            var imageUri: Uri? = data?.data
-            val uri = Utility.readUriImage(requireContext(),imageUri!!)
-            viewDataBinding.selectedImage.setImageURI(uri)
-            viewModel.setProductImageUri(uri!!)
-          //  viewDataBinding.selectedImage.setImageURI(data!!.data)
-
         }
     }
 

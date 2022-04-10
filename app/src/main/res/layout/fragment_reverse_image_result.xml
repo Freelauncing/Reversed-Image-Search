@@ -70,6 +70,30 @@
             app:layout_constraintTop_toBottomOf="@id/linearLayoutCompat2">
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/button5"
+                style="@style/button_lg"
+                android:layout_width="0dp"
+                android:layout_height="65dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:elevation="10dp"
+                android:hint="Add Product"
+                android:text="Clear"
+                android:onClick="@{()->viewmodel.clearResults()}"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:theme="@style/Theme.MaterialComponents.Light"
+                app:cornerRadius="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/button6"
                 style="@style/button_lg"
                 android:layout_width="0dp"

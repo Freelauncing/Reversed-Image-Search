@@ -98,26 +98,33 @@ class HomeViewModel:ViewModel() {
                             Log.d("UploadImage", "Yeepee!!! = " + document.body().text())
 
                             Uploaded_Image_Url = document.body().text()
-                            if(!Uploaded_Image_Url.isNullOrEmpty()){
-                                showSnackbarMessage("Image Uploaded Successfully !")
-                            }
 
-                        } else Log.d("UploadImage", "Response failure = " + response.message())
+                            showSnackbarMessage("Image Uploaded Successfully !")
+
+
+                        } else {
+                            Log.d("UploadImage", "Response failure = " + response.message())
+                            showSnackbarMessage("${response.message()} !")
+                        }
                     }
 
                     override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
                         _showLoading.value  = false
                         if (t is SocketTimeoutException) {
                             // "Connection Timeout";
+                            showSnackbarMessage("Connection Timeout !")
                             Log.e("UploadImage", "Connection Timeout")
                         } else if (t is IOException) {
                             // "Timeout";
+                            showSnackbarMessage("Timeout !")
                             Log.e("UploadImage", "Timeout")
                         } else {
                             //Call was cancelled by user
                             if (call.isCanceled) {
+                                showSnackbarMessage("Call was cancelled forcefully !")
                                 Log.e("UploadImage", "Call was cancelled forcefully")
                             } else {
+                                showSnackbarMessage("Network Error :: ${t.localizedMessage}!")
                                 //Generic error handling
                                 Log.e("UploadImage", "Network Error :: " + t.localizedMessage)
                             }

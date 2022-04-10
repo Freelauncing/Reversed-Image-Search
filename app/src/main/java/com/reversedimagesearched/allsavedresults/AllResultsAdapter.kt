@@ -1,38 +1,27 @@
-package com.reversedimagesearched.reverseimageresult
+package com.reversedimagesearched.allsavedresults
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.ProgressBar
-import androidx.core.net.toUri
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.ceylonlabs.imageviewpopup.ImagePopup
-import com.reversedimagesearched.MainActivity
 import com.reversedimagesearched.R
 import com.reversedimagesearched.data.database.DatabaseModel
 import com.reversedimagesearched.data.database.ReverseDbHelper
-import com.reversedimagesearched.data.model.CommonResponse
-import com.reversedimagesearched.home.HomeFragment.Companion.Uploaded_Image_Url
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.net.URL
+import com.reversedimagesearched.reverseimageresult.ReverseImageResultViewModel
 
 
-class ReverseImagesRecyclerViewAdapter(
-    val reverImageList: ArrayList<CommonResponse>,
-    val viewModel: ReverseImageResultViewModel,
-    context: Context
+class AllResultsAdapter(
+val reverImageList: ArrayList<DatabaseModel>,
+val viewModel: AllResultsViewModel,
+context: Context
 ) :
-    RecyclerView.Adapter<ReverseImagesRecyclerViewAdapter.MyViewHolder>() {
+RecyclerView.Adapter<AllResultsAdapter.MyViewHolder>() {
 
     var cxt: Context
 
@@ -40,7 +29,7 @@ class ReverseImagesRecyclerViewAdapter(
         cxt = context
     }
 
-    fun swapList(mreverImageList: ArrayList<CommonResponse>){
+    fun swapList(mreverImageList: ArrayList<DatabaseModel>){
         reverImageList.clear()
         Log.v("CHEKOO=>", mreverImageList.size.toString())
         reverImageList.addAll(mreverImageList)
@@ -51,7 +40,7 @@ class ReverseImagesRecyclerViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val view: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_products, parent, false)
+            .inflate(R.layout.item_all_result, parent, false)
         return MyViewHolder(view)
     }
 
@@ -65,34 +54,40 @@ class ReverseImagesRecyclerViewAdapter(
 
         holder.floatingActionButton.setOnClickListener {
 
-            (cxt as MainActivity).runOnUiThread(Runnable {
-                viewModel.takeUrl(currentItem = currentItem)
+            ReverseDbHelper.deleteReverseImageData(currentItem._id)
 
-            })
-
-
-
+            viewModel.getAllImagesListFromDb()
         }
 
         holder.image.setOnClickListener {
             val imagePopup = ImagePopup(cxt)
-            imagePopup.initiatePopupWithGlide(currentItem.image_link) // Load Image from Drawable
+            imagePopup.initiatePopupWithGlide(currentItem.downloadedImageUrl) // Load Image from Drawable
             imagePopup.viewPopup();
         }
 
-        Glide.with(cxt)
-            .load(currentItem.image_link.toUri())
-            .centerCrop()
-            .into(holder.image)
+        holder.realimage.setOnClickListener {
+            val imagePopup = ImagePopup(cxt)
+            imagePopup.initiatePopupWithGlide(currentItem.realimageurl) // Load Image from Drawable
+            imagePopup.viewPopup();
+        }
+
+        val bmp = BitmapFactory.decodeByteArray(currentItem.downloadedImage, 0, currentItem.downloadedImage.size)
+        holder.image.setImageBitmap(bmp)
+
+        val bmp1 = BitmapFactory.decodeByteArray(currentItem.realimage, 0, currentItem.realimage.size)
+        holder.realimage.setImageBitmap(bmp1)
+
     }
 
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var image: ImageView
-        var floatingActionButton:ImageButton
+        var realimage: ImageView
+        var floatingActionButton: ImageButton
 
         init {
             image = itemView.findViewById(R.id.image)
+            realimage = itemView.findViewById(R.id.realimage)
             floatingActionButton = itemView.findViewById(R.id.floatingActionButton)
         }
     }

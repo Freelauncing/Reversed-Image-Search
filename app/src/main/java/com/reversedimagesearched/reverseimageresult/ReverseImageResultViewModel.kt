@@ -2,19 +2,19 @@ package com.reversedimagesearched.reverseimageresult
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.reversedimagesearched.data.database.DatabaseModel
+import com.reversedimagesearched.data.database.ReverseDbHelper
 import com.reversedimagesearched.data.model.CommonResponse
 import com.reversedimagesearched.data.remote.ReverseImageRetreiver
 import com.reversedimagesearched.home.HomeFragment.Companion.Uploaded_Image_Url
 import com.reversedimagesearched.util.Event
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.Dispatcher
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -46,12 +46,12 @@ class ReverseImageResultViewModel:ViewModel() {
         selectedMode.value = ""
     }
 
-    fun onclickStoreAllImages(){
-
+    fun clearResults(){
+        _reverseImageLists.value = ArrayList()
+        _updateList.value = Event("Update")
     }
-
     fun onclickSearch(){
-//        if(!Uploaded_Image_Url.isNullOrEmpty()) {
+        if(!Uploaded_Image_Url.isNullOrEmpty()) {
             viewModelScope.launch {
                 _reverseImageLists.value = ArrayList()
                 Log.v("HELLO", "Check")
@@ -64,12 +64,12 @@ class ReverseImageResultViewModel:ViewModel() {
                     _reverseImageLists.value!!.addAll(res)
                 } else if (selectedMode.value.toString().equals("Bing")) {
                     var res =
-                        reverseImageRetreiver.bingInverseImage("https://gtl-bucket.s3.amazonaws.com/17fea9eeca784066beee881898e8cabc.jpg")
+                        reverseImageRetreiver.bingInverseImage(Uploaded_Image_Url)
                     Log.v("HELLO", res.toString())
                     _reverseImageLists.value!!.addAll(res)
                 } else if (selectedMode.value.toString().equals("Tineye")) {
                     var res =
-                        reverseImageRetreiver.tineyeInverseImage("https://gtl-bucket.s3.amazonaws.com/17fea9eeca784066beee881898e8cabc.jpg")
+                        reverseImageRetreiver.tineyeInverseImage(Uploaded_Image_Url)
                     Log.v("HELLO", res.toString())
                     _reverseImageLists.value!!.addAll(res)
                 } else {
@@ -79,17 +79,35 @@ class ReverseImageResultViewModel:ViewModel() {
                 _showLoading.value = false
                 Log.v("HELLO", _reverseImageLists.value!!.size.toString())
             }
-//        }else{
-//            showSnackbarMessage("No Image Uploaded")
-//        }
+        }else{
+            showSnackbarMessage("No Image Uploaded")
+        }
     }
 
-    fun convertToByteArray(url:String): ByteArray {
-        val baos = ByteArrayOutputStream()
-        runBlocking {
-            val bitmap = getImageBitmap(url)
-            bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, baos)
+    fun takeUrl(currentItem:CommonResponse) {
+        _showLoading.value = true
+        GlobalScope.launch(Dispatchers.IO) {
+            val res = ReverseDbHelper.insertReverseImage(
+                DatabaseModel(
+                    0,
+                    convertToByteArray(Uploaded_Image_Url) ,// Uploaded_Image_Url
+                    Uploaded_Image_Url,//Uploaded_Image_Url,
+                    convertToByteArray(currentItem.image_link),
+                    currentItem.image_link,
+                    currentItem.name)
+            )
+            launch(Dispatchers.Main) {
+                showSnackbarMessage("Image Downloaded Successfully")
+            }
         }
+
+        _showLoading.value = false
+    }
+
+    suspend fun convertToByteArray(url:String): ByteArray {
+        val baos = ByteArrayOutputStream()
+        val bitmap = getImageBitmap(url)
+        bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, baos)
         val photo: ByteArray = baos.toByteArray()
         return photo
     }
