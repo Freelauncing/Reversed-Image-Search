@@ -16,6 +16,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.reversedimagesearched.data.database.ReverseDbHelper
 import com.reversedimagesearched.util.ManagePermissions
 
 class MainActivity : AppCompatActivity() {
@@ -54,6 +55,8 @@ class MainActivity : AppCompatActivity() {
 
         val navController: NavController = findNavController(R.id.nav_host_fragment)
 
+        ReverseDbHelper.initDatabaseInstance(this)
+
         //Initialize the bottom navigation view
         //create bottom navigation view object
         bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigatin_view)
@@ -83,5 +86,11 @@ class MainActivity : AppCompatActivity() {
         var imageUri: Uri? = data?.data
         mycallBack.takeUri(imageUri!!)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ReverseDbHelper.closeDatabase()
+    }
+
 
 }

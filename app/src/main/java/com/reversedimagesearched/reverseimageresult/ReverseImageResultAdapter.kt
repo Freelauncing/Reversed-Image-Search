@@ -1,6 +1,9 @@
 package com.reversedimagesearched.reverseimageresult
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +14,19 @@ import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ceylonlabs.imageviewpopup.ImagePopup
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.reversedimagesearched.R
+import com.reversedimagesearched.data.database.DatabaseModel
+import com.reversedimagesearched.data.database.ReverseDbHelper
 import com.reversedimagesearched.data.model.CommonResponse
-import com.reversedimagesearched.util.Utility
+import com.reversedimagesearched.home.HomeFragment.Companion.Uploaded_Image_Url
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.net.URL
 
 
 class ReverseImagesRecyclerViewAdapter(
     val reverImageList: ArrayList<CommonResponse>,
+    val viewModel: ReverseImageResultViewModel,
     context: Context
 ) :
     RecyclerView.Adapter<ReverseImagesRecyclerViewAdapter.MyViewHolder>() {
@@ -54,6 +62,15 @@ class ReverseImagesRecyclerViewAdapter(
 
         holder.floatingActionButton.setOnClickListener {
 
+            ReverseDbHelper.insertReverseImage(
+                DatabaseModel(
+                0,
+                    viewModel.convertToByteArray("https://gtl-bucket.s3.amazonaws.com/17fea9eeca784066beee881898e8cabc.jpg"),// Uploaded_Image_Url
+                    "https://gtl-bucket.s3.amazonaws.com/17fea9eeca784066beee881898e8cabc.jpg",//Uploaded_Image_Url,
+                    viewModel.convertToByteArray(currentItem.image_link),
+                    currentItem.image_link,
+                    currentItem.name)
+            )
         }
 
         holder.image.setOnClickListener {
@@ -78,4 +95,6 @@ class ReverseImagesRecyclerViewAdapter(
             floatingActionButton = itemView.findViewById(R.id.floatingActionButton)
         }
     }
+
+
 }
